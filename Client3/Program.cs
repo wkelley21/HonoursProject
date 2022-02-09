@@ -9,11 +9,19 @@ namespace Client3
     {
         private const int listenPort = 11000;
 
+        //Creates a Timestamp for when messages are sent
+        public static String GetTimestamp(DateTime value)
+        {
+            return value.ToString(" HH:mm:ss dd/MM/yyyy");
+
+        }
+
         private static void StartListener()
         {
             Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             UdpClient listener = new UdpClient(listenPort);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
+            String timeStamp = GetTimestamp(DateTime.Now);
 
             try
             {
@@ -21,10 +29,10 @@ namespace Client3
                 {
                     Console.WriteLine("Waiting for broadcast");
                     byte[] bytes = listener.Receive(ref groupEP);
-                    Console.WriteLine($"Received broadcast from {groupEP} :");
-                    Console.WriteLine($" {Encoding.ASCII.GetString(bytes, 0, bytes.Length)}");
+                    Console.WriteLine($"Received broadcast from {groupEP}:");
+                    Console.WriteLine($"{Encoding.ASCII.GetString(bytes, 0, bytes.Length)}");
                     string sendStr = Console.ReadLine();
-                    byte[] sendbuf = Encoding.ASCII.GetBytes(sendStr);
+                    byte[] sendbuf = Encoding.ASCII.GetBytes(sendStr + timeStamp);
                     s.SendTo(sendbuf, groupEP);
                 }
             }
@@ -38,6 +46,7 @@ namespace Client3
             }
         }
 
+        
         public static void Main()
         {
             StartListener();
